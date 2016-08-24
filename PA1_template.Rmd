@@ -28,7 +28,10 @@ data <- read.csv("activity.csv")
 require(dplyr)
 
 stepsByDate <- data %>% group_by(date) %>% 
-  summarise(steps = sum(steps))
+        summarise(steps = sum(steps))
+
+avgStepsByInterval <- data %>% group_by(interval) %>% summarise(avgSteps = mean(steps, na.rm = TRUE))
+
 
 ```
 
@@ -37,7 +40,7 @@ stepsByDate <- data %>% group_by(date) %>%
 ```{r}
 require(ggplot2)
 require(ggthemes)
-ggplot(stepsByDate, aes(steps)) + geom_histogram(fill = '#334385', color = 'black') + theme_economist() + labs(title = 'Histogram over Steps') + theme(plot.title = element_text(hjust = 0.5))
+ggplot(stepsByDate, aes(steps)) + geom_histogram(fill = '#334385', color = 'black', binwidth = 500) + theme_economist() + labs(title = 'Histogram over Steps') + theme(plot.title = element_text(hjust = 0.5))
 
 mean <- mean(stepsByDate$steps, na.rm = TRUE)
 median <- median(stepsByDate$steps, na.rm = TRUE)
@@ -48,7 +51,13 @@ median <- median(stepsByDate$steps, na.rm = TRUE)
 
 
 ## What is the average daily activity pattern?
+```{r}
+ggplot(avgStepsByInterval, aes(interval, avgSteps)) + geom_line(color ='#33877D') + theme_economist()
 
+maxInterval <- avgStepsByInterval$interval[which.max(avgStepsByInterval$avgSteps)]
+
+```
+- Interval which has the maximum of average steps: `r maxInterval`
 
 
 ## Imputing missing values
