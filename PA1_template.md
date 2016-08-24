@@ -1,24 +1,13 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
-```{r, echo = FALSE}
-setwd("C:/Users/kristoffer.peyron/Dropbox/Coursera/Data Science Specialization/5. Reproducible Research/week 2/RepData_PeerAssessment1")
 
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
-
-
-```
 
 
 ## Loading and preprocessing the data
 
-```{r}
 
+```r
 if(!file.exists("activity.csv")){
         unzip("activity.zip")
 }
@@ -29,22 +18,26 @@ require(dplyr)
 
 stepsByDate <- data %>% group_by(date) %>% 
   summarise(steps = sum(steps))
-
 ```
 
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 require(ggplot2)
 require(ggthemes)
+require(xtable)
 ggplot(stepsByDate, aes(steps)) + geom_histogram(fill = '#334385', color = 'black') + theme_economist() + labs(title = 'Histogram over Steps') + theme(plot.title = element_text(hjust = 0.5))
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 mean <- mean(stepsByDate$steps, na.rm = TRUE)
 median <- median(stepsByDate$steps, na.rm = TRUE)
-
 ```
-- Mean: `r mean`
-- Median: `r median`
+- Mean: 1.0766189\times 10^{4}
+- Median: 10765
 
 
 ## What is the average daily activity pattern?
