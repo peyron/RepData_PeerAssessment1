@@ -72,7 +72,7 @@ numNA <- sum(is.na(data$steps))
 - Number of NA's: `r numNA`
 
 ```{r}
-## The strategy for replacing missing values is to impute avg of respective period into where missing value is
+## The strategy for replacing missing values is to impute avg of steps by respective interval into where missing value is
 
 dataInput <- data
 
