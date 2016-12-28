@@ -1,13 +1,12 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 output: 
-  html_document:
-    keep_md: true
+html_document:
+keep_md: true
 ---
 
 
-```{r, echo = FALSE}
-setwd("C:/Users/kristoffer.peyron/Dropbox/Coursera/Data Science Specialization/5. Reproducible Research/week 2/RepData_PeerAssessment1")
+```{r, include=FALSE}
 
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 
@@ -31,7 +30,7 @@ data <- read.csv("activity.csv")
 
 
 stepsByDate <- data %>% group_by(date) %>% 
-        summarise(steps = sum(steps))
+        summarise(steps = sum(steps, na.rm = TRUE))
 
 avgStepsByInterval <- data %>% group_by(interval) %>% summarise(avgSteps = mean(steps, na.rm = TRUE))
 
@@ -55,7 +54,7 @@ median <- median(stepsByDate$steps, na.rm = TRUE)
 
 ## What is the average daily activity pattern?
 ```{r}
-ggplot(avgStepsByInterval, aes(interval, avgSteps)) + geom_line(color ='#33877D') + theme_economist()
+ggplot(avgStepsByInterval, aes(interval, avgSteps)) + geom_line(color ='#33877D') + theme_economist() + ylab('Average Steps')
 
 maxInterval <- avgStepsByInterval$interval[which.max(avgStepsByInterval$avgSteps)]
 
@@ -73,13 +72,13 @@ numNA <- sum(is.na(data$steps))
 - Number of NA's: `r numNA`
 
 ```{r}
+## The strategy for replacing missing values is to impute avg of respective period into where missing value is
+
 dataInput <- data
-#[i]
 
 replaceNA <- function(var, interval){
         if(is.na(var)){
                 var <- avgStepsByInterval$avgSteps[avgStepsByInterval$interval == interval]
-                        #avgStepsByInterval$avgSteps[dataInput$interval == avgStepsByInterval$interval]
         }
         else
                 var
@@ -87,24 +86,9 @@ replaceNA <- function(var, interval){
 
 dataInput$steps <- mapply(replaceNA, dataInput$steps, dataInput$interval)
 
-fill.value <- function(steps, interval) {
-    filled <- NA
-    if (!is.na(steps))
-        filled <- c(steps)
-    else
-        filled <- (averages[averages$interval==interval, "steps"])
-    return(filled)
-}
-
-for(i in 1:nrow(dataInput)){
-        if(is.na(dataInput$steps[i])){
-                dataInput$steps[i] <- avgStepsByInterval$avgSteps[dataInput$interval[i] == avgStepsByInterval$interval]
-        }
-}
-
 
 stepsByDateInput <- dataInput %>% group_by(date) %>% 
-        summarise(steps = sum(steps))
+        summarise(steps = sum(steps, na.rm = TRUE))
 
 ggplot(stepsByDateInput, aes(steps)) + geom_histogram(fill = '#334385', color = 'black', binwidth = 500) + theme_economist() + labs(title = 'Histogram over Steps (after imputation)') + theme(plot.title = element_text(hjust = 0.5))
 
@@ -120,7 +104,10 @@ medianInput <- median(stepsByDateInput$steps, na.rm = TRUE)
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ``` {r}
-dataInput$weekpart <- ifelse(as.POSIXlt(dataInput$date)$wday %in% c(6,0), 'weekend', 'weekday')
+dataInput$weekpart <- ifelse(as.POSIXlt(dataInput$date)$wday %in% c(6,0), 'weekend', 'weekday') %>% as.factor()
 
+avgStepsByIntervalInput <- dataInput %>% group_by(interval, weekpart) %>% summarise(avgSteps = mean(steps, na.rm = TRUE))
+
+ggplot(avgStepsByIntervalInput, aes(interval, avgSteps)) + geom_line(color ='#33877D') + theme_economist() + facet_wrap(~weekpart, nrow = 2) + ylab('Average Steps')
 
 ```

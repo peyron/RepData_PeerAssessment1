@@ -2,9 +2,6 @@
 
 
 
-```
-## [1] "English_United States.1252"
-```
 
 
 ## Loading and preprocessing the data
@@ -23,7 +20,7 @@ data <- read.csv("activity.csv")
 
 
 stepsByDate <- data %>% group_by(date) %>% 
-        summarise(steps = sum(steps))
+        summarise(steps = sum(steps, na.rm = TRUE))
 
 avgStepsByInterval <- data %>% group_by(interval) %>% summarise(avgSteps = mean(steps, na.rm = TRUE))
 ```
@@ -40,17 +37,23 @@ ggplot(stepsByDate, aes(steps)) + geom_histogram(fill = '#334385', color = 'blac
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ```r
+total.steps <- tapply(data$steps, data$date, FUN = sum, na.rm = TRUE)
+
 mean <- mean(stepsByDate$steps, na.rm = TRUE)
 median <- median(stepsByDate$steps, na.rm = TRUE)
+mean2 <- mean(total.steps, na.rm = TRUE)
+median2 <- median(total.steps, na.rm = TRUE)
 ```
-- Mean: 1.0766189\times 10^{4}
-- Median: 10765
+- Mean: 9354.2295082
+- Median: 10395
+- Mean: 9354.2295082
+- Median: 10395
 
 
 ## What is the average daily activity pattern?
 
 ```r
-ggplot(avgStepsByInterval, aes(interval, avgSteps)) + geom_line(color ='#33877D') + theme_economist()
+ggplot(avgStepsByInterval, aes(interval, avgSteps)) + geom_line(color ='#33877D') + theme_economist() + ylab('Average Steps')
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
@@ -122,5 +125,11 @@ medianInput <- median(stepsByDateInput$steps, na.rm = TRUE)
 
 
 ```r
-dataInput$weekpart <- ifelse(as.POSIXlt(dataInput$date)$wday %in% c(6,0), 'weekend', 'weekday')
+dataInput$weekpart <- ifelse(as.POSIXlt(dataInput$date)$wday %in% c(6,0), 'weekend', 'weekday') %>% as.factor()
+
+avgStepsByIntervalInput <- dataInput %>% group_by(interval, weekpart) %>% summarise(avgSteps = mean(steps, na.rm = TRUE))
+
+ggplot(avgStepsByIntervalInput, aes(interval, avgSteps)) + geom_line(color ='#33877D') + theme_economist() + facet_wrap(~weekpart, nrow = 2) + ylab('Average Steps')
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
