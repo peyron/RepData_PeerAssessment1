@@ -1,14 +1,14 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 output: 
-html_document:
-keep_md: true
+  html_document:
+    keep_md: true
 ---
 
 
 ```{r, include=FALSE}
 
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path='figure/')
 
 Sys.setlocale("LC_TIME","English")
 
